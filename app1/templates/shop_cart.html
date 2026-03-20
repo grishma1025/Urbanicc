@@ -1,0 +1,222 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block body %}
+
+<link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
+
+<!-- Breadcrumb -->
+<div class="container">
+    <div class="breadcrumb__links">
+        <a href="/"><i class="fa fa-home"></i> Home</a>
+        <span>Shopping Cart</span>
+    </div>
+</div>
+
+<!-- Cart Section -->
+<section class="shop-cart spad">
+    <div class="container">
+
+        <!-- CART TABLE -->
+        <div class="shop__cart__table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>Price</th>
+                        <th style="width:170px">Quantity</th>
+                        <th>Total</th>
+                        <th></th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                {% if cart_items %}
+                    {% for item in cart_items %}
+                    <tr>
+
+                        <!-- PRODUCT INFO -->
+                        <td class="cart__product__item">
+                            <img src="{{ item.product.image.url }}" class="cart-thumb">
+                            <div class="cart__product__item__title">
+                                <h6>{{ item.product.title }}</h6>
+                            </div>
+                        </td>
+
+                        <!-- PRICE -->
+                        <td class="cart__price">₹ {{ item.product.price }}</td>
+
+                        <!-- QUANTITY FORM -->
+                        <td class="cart__quantity">
+                            <form action="{% url 'update_cart' cart_id=item.id %}" method="POST" class="cart-update-form">
+                                {% csrf_token %}
+
+                                <div class="quantity">
+                                    <button type="button" class="qty-minus">-</button>
+                                    <input name="quantity" type="number" value="{{ item.quantity }}" class="qty-input">
+                                    <button type="button" class="qty-plus">+</button>
+                                </div>
+
+                                <button type="submit" class="btn-update mt-2">Update</button>
+                            </form>
+                        </td>
+
+                        <!-- TOTAL -->
+                        <td class="cart__total">₹ {{ item.subtotal }}</td>
+
+                        <!-- REMOVE -->
+                        <td>
+                            <a href="{% url 'remove_from_cart' item.id %}" class="btn-remove">Remove</a>
+                        </td>
+
+                    </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="5" class="text-center py-5">
+                            <h5>Your cart is empty</h5>
+                            <a href="/shop/" class="btn btn-primary mt-3">Shop Now</a>
+                        </td>
+                    </tr>
+                {% endif %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- CONTINUE SHOPPING -->
+        <div class="cart__btn mt-3">
+            <a href="/shop/">Continue Shopping</a>
+        </div>
+
+        {% if cart_items %}
+        <div class="row mt-4">
+
+            <!-- DISCOUNT -->
+            <div class="col-lg-6">
+                <div class="discount__content">
+                    <h6>Discount Code</h6>
+                    <form>
+                        <input type="text" placeholder="Enter your coupon code">
+                        <button type="submit" class="site-btn">Apply</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- CART TOTAL -->
+            <div class="col-lg-4 offset-lg-2">
+                <div class="cart__total__procced">
+                    <h6>Cart Total</h6>
+                    <ul>
+                        <li>Subtotal <span>₹ {{ subtotal }}</span></li>
+                        <li>Total <span>₹ {{ total }}</span></li>
+                    </ul>
+
+                    {% if user.is_authenticated %}
+                        <a href="/checkout/" class="primary-btn">Proceed to Checkout</a>
+                    {% else %}
+                        <a href="/login/?next=/checkout/" class="primary-btn">Login to Continue</a>
+                    {% endif %}
+                </div>
+            </div>
+
+        </div>
+        {% endif %}
+
+    </div>
+</section>
+
+<!-- JS FOR +/- BUTTONS -->
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    document.querySelectorAll(".qty-plus").forEach(btn => {
+        btn.addEventListener("click", function () {
+            let input = btn.parentElement.querySelector(".qty-input");
+            let value = parseInt(input.value) || 1;
+            input.value = value + 1;
+        });
+    });
+
+    document.querySelectorAll(".qty-minus").forEach(btn => {
+        btn.addEventListener("click", function () {
+            let input = btn.parentElement.querySelector(".qty-input");
+            let value = parseInt(input.value) || 1;
+            if (value > 1) input.value = value - 1;
+        });
+    });
+
+});
+</script>
+
+<!-- ORIGINAL INTERNAL CSS (unchanged) -->
+<style>
+.cart-thumb {
+    width: 80px;
+    border-radius: 6px;
+}
+
+.quantity {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.qty-input {
+    width: 45px;
+    padding: 6px;
+    text-align: center;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.qty-minus, .qty-plus {
+    width: 32px;
+    height: 32px;
+    border: none;
+    background: #eee;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.qty-minus:hover, .qty-plus:hover {
+    background: #dcdcdc;
+}
+
+.btn-update {
+    background: #1976d2;
+    color: #fff;
+    padding: 6px 16px;
+    border-radius: 6px;
+    border: none;
+    font-weight: 600;
+}
+
+.btn-update:hover {
+    background: #115a9c;
+}
+
+.btn-remove {
+    background: #d32f2f;
+    padding: 6px 16px;
+    border-radius: 6px;
+    color: white;
+    font-weight: 600;
+}
+
+.btn-remove:hover {
+    background: #b71c1c;
+}
+
+.shop__cart__table table td {
+    vertical-align: middle !important;
+}
+
+.cart__product__item__title h6 {
+    margin-bottom: 5px;
+    font-weight: 600;
+}
+</style>
+
+{% endblock %}

@@ -1,0 +1,229 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block body %}
+
+<link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
+
+<!-- Breadcrumb Begin -->
+<div class="breadcrumb-option">
+    <div class="container">
+        <div class="breadcrumb__links">
+            <a href="{% url 'index' %}"><i class="fa fa-home"></i> Home</a>
+            <span>{{ product.title }}</span>
+        </div>
+    </div>
+</div>
+<!-- Breadcrumb End -->
+
+<!-- Product Details Section Begin -->
+<section class="product-details spad">
+    <div class="container">
+        <div class="row">
+
+            <!-- LEFT — Product Images -->
+            <div class="col-lg-6">
+                <div class="product__details__pic">
+                    <div class="product__details__pic__left product__thumb nice-scroll">
+
+                        {% if images %}
+                            {% for img in images %}
+                            <a class="pt {% if forloop.first %}active{% endif %}" href="#big-{{ forloop.counter }}">
+                                <img src="{{ img.image.url }}">
+                            </a>
+                            {% endfor %}
+                        {% else %}
+                            <a class="pt active" href="#big-1">
+                                <img src="{{ product.image.url }}">
+                            </a>
+                        {% endif %}
+                    </div>
+
+                    <div class="product__details__slider__content">
+                        <div class="product__details__pic__slider owl-carousel">
+                            {% if images %}
+                                {% for img in images %}
+                                <img id="big-{{ forloop.counter }}" class="product__big__img"
+                                     src="{{ img.image.url }}">
+                                {% endfor %}
+                            {% else %}
+                                <img id="big-1" class="product__big__img" src="{{ product.image.url }}">
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RIGHT — Product Details -->
+            <div class="col-lg-6">
+                <div class="product__details__text">
+
+                    <h3>{{ product.title }}</h3>
+
+                    <!-- Ratings -->
+                    <div class="rating">
+                        {% for i in 5|make_list %}
+                            {% if forloop.counter <= product.rating %}
+                                <i class="fa fa-star"></i>
+                            {% else %}
+                                <i class="fa fa-star-o"></i>
+                            {% endif %}
+                        {% endfor %}
+                        <span>({{ product.reviews.count }} reviews)</span>
+                    </div>
+
+                    <!-- Price -->
+                    <div class="product__details__price" id="product-price">
+                        ₹{{ product.price }}
+                        {% if product.old_price %}
+                            <span>₹{{ product.old_price }}</span>
+                        {% endif %}
+                    </div>
+
+                    <p>{{ product.description }}</p>
+
+                    <!-- ADD TO CART -->
+                    <form method="post" action="{% url 'add_to_cart' product.id %}">
+                        {% csrf_token %}
+
+                        <div class="product__details__button d-flex align-items-center">
+
+                            {% if variants %}
+                            <div class="mr-3">
+                                <label><strong>Choose Variant:</strong></label>
+                                <select name="variant" id="variant-select" class="form-control" required>
+                                    <option value="">Select...</option>
+                                    {% for v in variants %}
+                                        <option value="{{ v.id }}"
+                                                data-price="{{ v.price|default:product.price }}">
+                                            {{ v.size }} {% if v.color %}- {{ v.color }}{% endif %}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            {% endif %}
+
+                            <div class="quantity mr-3">
+                                <span>Qty:</span>
+                                <div class="pro-qty">
+                                    <input type="number" name="quantity" min="1" value="1">
+                                </div>
+                            </div>
+
+                            <a href="{% url 'add_to_cart' product.id %}" class="btn-add-cart">
+                                <span class="icon_bag_alt"></span> Add to Cart
+                            </a>
+
+                          {% if user.is_authenticated %}
+    {% if in_wishlist %}
+        <a href="{% url 'toggle_wishlist' product.id %}" class="btn-wishlist active">
+            Remove from Wishlist <span class="icon_heart"></span>
+        </a>
+    {% else %}
+        <a href="{% url 'toggle_wishlist' product.id %}" class="btn-wishlist">
+            Add to Wishlist <span class="icon_heart_alt"></span>
+        </a>
+    {% endif %}
+{% else %}
+    <a href="{% url 'login' %}?next={% url 'product_details' product.slug %}"
+       class="btn-wishlist">
+        Add to Wishlist <span class="icon_heart_alt"></span>
+    </a>
+{% endif %}
+
+
+                        </div>
+                    </form>
+
+                    <!-- Stock Info -->
+                    <div class="product__details__widget mt-4">
+                        <ul>
+                            <li>
+                                <span>Availability:</span>
+                                <p>{% if product.stock > 0 %}In Stock{% else %}Out of Stock{% endif %}</p>
+                            </li>
+                            <li><span>Shipping:</span> <p>Free shipping above ₹499.</p></li>
+                        </ul>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- PRICE CHANGE ON VARIANT -->
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+    const variant = document.getElementById("variant-select");
+    const priceBox = document.getElementById("product-price");
+
+    if (variant) {
+        variant.addEventListener("change", function(){
+            let p = this.selectedOptions[0].dataset.price;
+            priceBox.innerHTML = `₹${p}`;
+        });
+    }
+});
+</script>
+
+<!-- ===============================
+     PREMIUM BUTTON & UI STYLES
+================================ -->
+<style>
+.product__details__button { gap: 14px; flex-wrap: wrap; }
+
+.btn-add-cart {
+    background: #e53935;
+    color: #fff !important;
+    padding: 14px 34px;
+    border-radius: 50px;
+    font-size: 15px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 10px 25px rgba(229,57,53,.25);
+    transition: .3s;
+}
+.btn-add-cart:hover {
+    background: #c62828;
+    transform: translateY(-2px);
+}
+
+.btn-wishlist {
+    border: 2px solid #e53935;
+    padding: 13px 28px;
+    border-radius: 50px;
+    color: #e53935 !important;
+    font-weight: 600;
+    transition: .3s;
+}
+.btn-wishlist:hover {
+    background: #e53935;
+    color: #fff !important;
+}
+
+.product__details__price {
+    font-size: 28px;
+    font-weight: 700;
+    color: #e53935;
+}
+.product__details__price span {
+    font-size: 18px;
+    color: #999;
+    margin-left: 10px;
+    text-decoration: line-through;
+}
+
+#variant-select,
+.pro-qty input {
+    height: 44px;
+    border-radius: 30px;
+    font-weight: 500;
+}
+</style>
+
+{% endblock %}

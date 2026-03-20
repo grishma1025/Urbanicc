@@ -1,0 +1,181 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block content %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Reports Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #f4f6f9;
+            padding: 20px;
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        /* GRID LAYOUT */
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            max-width: 1100px;
+            margin: auto;
+        }
+
+        /* CARD STYLE */
+        .card {
+            background: white;
+            padding: 15px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .card h3 {
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        canvas {
+            max-height: 250px !important;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<h2>📊 Reports Dashboard</h2>
+
+<div class="dashboard">
+
+    <div class="card">
+        <h3>Product Stock</h3>
+        <canvas id="productChart"></canvas>
+    </div>
+
+    <div class="card">
+        <h3>Orders Over Time</h3>
+        <canvas id="orderChart"></canvas>
+    </div>
+
+    <div class="card">
+        <h3>Top Products Sold</h3>
+        <canvas id="topChart"></canvas>
+    </div>
+
+    <div class="card">
+        <h3>Revenue per Product</h3>
+        <canvas id="revenueChart"></canvas>
+    </div>
+
+</div>
+
+
+<script>
+let charts = {};  // store chart instances
+function createChart(id, type, data) {
+    if (charts[id]) {
+        charts[id].destroy();  // prevent overlapping charts
+    }
+
+    charts[id] = new Chart(document.getElementById(id), {
+        type: type,
+        data: data,
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'top',
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return context.label + ": " + context.raw + "%";
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
+function loadCharts() {
+
+    // 📊 Product Stock
+    fetch('/product-data/')
+    .then(res => res.json())
+    .then(data => {
+        createChart('productChart', 'bar', {
+            labels: data.labels,
+            datasets: [{
+                label: 'Stock',
+                data: data.values,
+                backgroundColor: '#4e73df'
+            }]
+        });
+    });
+
+    // 📈 Orders Over Time
+    fetch('/order-data/')
+    .then(res => res.json())
+    .then(data => {
+        createChart('orderChart', 'line', {
+            labels: data.labels,
+            datasets: [{
+                label: 'Orders',
+                data: data.values,
+                borderColor: '#1cc88a',
+                fill: false,
+                tension: 0.3
+            }]
+        });
+    });
+
+    // 🥧 Top Products
+    fetch('/top-products/')
+.then(res => res.json())
+.then(data => {
+    createChart('topChart', 'pie', {
+        labels: data.labels,
+        datasets: [{
+            data: data.values,
+            backgroundColor: ['#f6c23e','#e74a3b','#36b9cc','#858796','#5a5c69']
+        }]
+    });
+});
+
+    // 📊 Revenue
+    fetch('/revenue-products/')
+.then(res => res.json())
+.then(data => {
+    createChart('revenueChart', 'pie', {
+        labels: data.labels,
+        datasets: [{
+            data: data.values,
+            backgroundColor: ['#4e73df','#1cc88a','#36b9cc','#f6c23e','#e74a3b']
+        }]
+    });
+});
+}
+
+loadCharts();
+setInterval(loadCharts, 5000);
+</script>
+
+</body>
+</html>
+{% endblock %}

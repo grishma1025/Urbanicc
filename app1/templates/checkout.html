@@ -1,0 +1,203 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block body %}
+
+<link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
+
+<div class="checkout-wrapper">
+<br/>
+    <div class="container">
+
+        <!-- ✅ SUCCESS / ERROR MESSAGES -->
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} text-center">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <div class="row">
+            <div class="col-lg-7">
+                <h3 class="checkout-heading">BILLING DETAIL</h3>
+
+                <form method="POST" action="{% url 'place_order' %}">
+                    {% csrf_token %}
+
+                    <!-- IMPORTANT -->
+                    <input type="hidden" name="total_amount" value="{{ total_amount }}">
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label>First Name *</label>
+                            <input name="full_name" type="text" class="form-control input-style" required>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label>Last Name *</label>
+                            <input type="text" class="form-control input-style" required>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Country *</label>
+                        <input type="text" class="form-control input-style" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Address *</label>
+                        <input name="address" type="text" placeholder="Street Address" class="form-control input-style" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <input type="text" placeholder="Apartment, suite, unit etc (optional)" class="form-control input-style">
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Town/City *</label>
+                        <input name="city" type="text" class="form-control input-style" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Country/State *</label>
+                        <input name="state" type="text" class="form-control input-style" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Pincode *</label>
+                        <input name="pincode" type="text" class="form-control input-style" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Email *</label>
+                        <input name="email" type="email" class="form-control input-style" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Phone *</label>
+                        <input name="phone" type="text" class="form-control input-style" required>
+                    </div>
+
+                    <!-- PAYMENT INFO -->
+                    <p class="payment-note">
+                        Payment Method: <strong>Cash on Delivery</strong>
+                    </p>
+
+                    <!-- ✅ FIXED BUTTON -->
+                    <button type="submit" class="btn-checkout-submit">
+                        Place Order (Cash on Delivery)
+                    </button>
+                </form>
+            </div>
+
+            <!-- RIGHT: ORDER SUMMARY -->
+            <div class="col-lg-5">
+                <div class="order-summary-box">
+                    <h4 class="summary-title">YOUR ORDER</h4>
+
+                    <div class="summary-list">
+                        {% for item in cart_items %}
+                        <div class="summary-product">
+                            <span>0{{ forloop.counter }}. {{ item.product.title }}</span>
+                            <span>₹{{ item.subtotal }}</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    <hr>
+
+                    <div class="summary-bottom">
+                        <div class="summary-line">
+                            <span>Subtotal</span>
+                            <span>₹{{ total_amount }}</span>
+                        </div>
+
+                        <div class="summary-line total">
+                            <span>Total</span>
+                            <span>₹{{ total_amount }}</span>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<style>
+.checkout-heading {
+    font-size: 22px;
+    font-weight: 600;
+    margin-bottom: 25px;
+}
+
+.input-style {
+    border-radius: 6px;
+    padding: 12px;
+    border: 1px solid #ddd;
+}
+
+.btn-checkout-submit {
+    margin-top: 20px;
+    width: 100%;
+    background: black;
+    color: white;
+    padding: 14px;
+    border: none;
+    border-radius: 6px;
+    font-size: 17px;
+    cursor: pointer;
+}
+
+.btn-checkout-submit:hover {
+    background: #333;
+}
+
+.payment-note {
+    margin-top: 15px;
+    font-size: 15px;
+    color: #555;
+}
+
+.order-summary-box {
+    background: #fafafa;
+    border-radius: 12px;
+    padding: 25px;
+    border: 1px solid #eee;
+}
+
+.summary-title {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 20px;
+}
+
+.summary-product {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    font-size: 16px;
+}
+
+.summary-bottom {
+    margin-top: 20px;
+}
+
+.summary-line {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.summary-line.total span:last-child {
+    font-weight: bold;
+    color: red;
+}
+</style>
+
+{% endblock %}

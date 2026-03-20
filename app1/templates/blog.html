@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block body %}
+
+<section class="blog spad">
+    <div class="container">
+        <div class="row">
+
+            {% for post in posts %}
+            <div class="col-lg-4 col-md-4 col-sm-6">
+                <div class="blog__item">
+                    <div class="blog__item__pic set-bg" data-setbg="{{ post.image.url }}"></div>
+
+                    <div class="blog__item__text">
+                        <h6>
+                            <a href="{% url 'blog_detail' post.slug %}">
+                                {{ post.title|truncatewords:8 }}
+                            </a>
+                        </h6>
+                        <ul>
+                            <li>by <span>{{ post.author }}</span></li>
+                            <li>{{ post.created_at }}</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+
+        </div>
+    </div>
+</section>
+
+{% endblock body %}

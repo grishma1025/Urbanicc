@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block body %}
+
+<!-- Breadcrumb -->
+<div class="breadcrumb-option">
+    <div class="container">
+        <div class="breadcrumb__links">
+            <a href="/"><i class="fa fa-home"></i> Home</a>
+            <span>About Us</span>
+        </div>
+    </div>
+</div>
+
+<!-- ABOUT SECTION -->
+<section class="about spad">
+    <div class="container">
+
+        <div class="row align-items-center mb-5">
+            <div class="col-lg-6">
+                <img src="{% static 'img/blog/blog-8.jpg' %}" 
+                     class="img-fluid rounded shadow"
+                     alt="About Urbanic">
+            </div>
+
+            <div class="col-lg-6">
+                <h2>About Urbanic</h2>
+                <p class="mt-3">
+                    Welcome to Urbanic — a modern clothing and lifestyle brand designed 
+                    for confident, stylish, and trend-driven individuals.  
+                    We believe fashion should be accessible, expressive, and fun.
+                </p>
+
+                <p>
+                    Our mission is to deliver curated collections inspired by global 
+                    trends while staying true to comfort, quality, and affordability.
+                </p>
+
+                <p>
+                    From everyday essentials to seasonal statement pieces, Urbanic aims 
+                    to make fashion effortless for everyone.
+                </p>
+            </div>
+        </div>
+
+        <!-- Our Values -->
+        <div class="about__values text-center mt-5">
+            <h3>Our Core Values</h3>
+
+            <div class="row mt-4">
+
+                <div class="col-lg-4 col-sm-6 mb-4">
+                    <div class="p-4 border rounded shadow-sm">
+                        <span class="fa fa-heart" style="font-size: 35px;"></span>
+                        <h5 class="mt-3">Customer First</h5>
+                        <p>We focus on delivering the best shopping experience possible.</p>
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-sm-6 mb-4">
+                    <div class="p-4 border rounded shadow-sm">
+                        <span class="fa fa-star" style="font-size: 35px;"></span>
+                        <h5 class="mt-3">Quality Products</h5>
+                        <p>Every item is carefully selected for style, durability, and comfort.</p>
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-sm-6 mb-4">
+                    <div class="p-4 border rounded shadow-sm">
+                        <span class="fa fa-globe" style="font-size: 35px;"></span>
+                        <h5 class="mt-3">Modern Fashion</h5>
+                        <p>We stay ahead of global trends to bring fresh styles to you.</p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+</section>
+
+{% endblock %}

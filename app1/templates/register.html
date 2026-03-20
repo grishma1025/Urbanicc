@@ -1,0 +1,180 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block body %}
+
+<link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
+
+<!-- Breadcrumb Begin -->
+<div class="breadcrumb-option">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="breadcrumb__links">
+                    <a href="/"><i class="fa fa-home"></i> Home</a>
+                    <span>Register</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Breadcrumb End -->
+
+<!-- Register Section Begin -->
+<section class="contact spad">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-6 col-md-8">
+
+                <div class="contact__content">
+                    <div class="contact__form text-center">
+                        <h5>Register</h5>
+
+                        <form action="/register/" method="post" id="registerForm">
+                            {% csrf_token %}
+
+                            <div class="form-group text-left">
+                                <input type="text" class="form-control mb-3" id="fname" name="fname" placeholder="First Name" required>
+                                <input type="text" class="form-control mb-3" id="lname" name="lname" placeholder="Last Name" required>
+                                <input type="email" class="form-control mb-3" id="email" name="email" placeholder="Email" required>
+                                <input type="text" class="form-control mb-3" id="uname" name="uname" placeholder="Username" required>
+
+                                <!-- Password -->
+                                <div class="password-wrapper mb-2">
+                                    <input type="password" class="form-control" id="pwd" name="pwd" placeholder="Password" required>
+                                    <span class="toggle-password" onclick="togglePassword('pwd')">👁</span>
+                                </div>
+
+                                <!-- Password Strength -->
+                                <small id="strength-msg"></small>
+
+                                <!-- Confirm Password -->
+                                <div class="password-wrapper mt-3">
+                                    <input type="password" class="form-control" id="cpwd" name="cpwd" placeholder="Confirm Password" required>
+                                    <span class="toggle-password" onclick="togglePassword('cpwd')">👁</span>
+                                </div>
+
+                                <small id="error-msg" class="text-danger"></small>
+                            </div>
+
+                            <button type="submit" class="site-btn mb-3">Register</button>
+                            <br>
+                            Already registered? <a href="/login/">Click here...</a>
+                        </form>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</section>
+<!-- Register Section End -->
+
+<!-- Instagram Begin -->
+<div class="instagram">
+    <div class="container-fluid">
+        <div class="row">
+            {% for i in "123456" %}
+            <div class="col-lg-2 col-md-4 col-sm-4 p-0">
+                <div class="instagram__item set-bg"
+                     data-setbg="{% static 'img/instagram/insta-' %}{{ i }}.jpg">
+                    <div class="instagram__text">
+                        <i class="fa fa-instagram"></i>
+                        <a href="#">@ ashion_shop</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+<!-- Instagram End -->
+
+<!-- ================= CSS ================= -->
+<style>
+.password-wrapper {
+    position: relative;
+}
+
+.toggle-password {
+    position: absolute;
+    right: 12px;
+    top: 11px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+#strength-msg {
+    font-size: 13px;
+}
+</style>
+
+<!-- ================= JS ================= -->
+<script>
+function togglePassword(id) {
+    const field = document.getElementById(id);
+    field.type = field.type === "password" ? "text" : "password";
+}
+
+document.getElementById("pwd").addEventListener("input", function () {
+    const strengthMsg = document.getElementById("strength-msg");
+    const val = this.value;
+
+    if (val.length < 6) {
+        strengthMsg.innerText = "Weak password (min 6 characters)";
+        strengthMsg.style.color = "red";
+    } else if (!/[A-Z]/.test(val) || !/[0-9]/.test(val)) {
+        strengthMsg.innerText = "Medium strength (add number & capital letter)";
+        strengthMsg.style.color = "orange";
+    } else {
+        strengthMsg.innerText = "Strong password 💪";
+        strengthMsg.style.color = "green";
+    }
+});
+
+document.getElementById("registerForm").addEventListener("submit", function(e) {
+    const fname = fname.value.trim();
+    const lname = lname.value.trim();
+    const email = email.value.trim();
+    const uname = uname.value.trim();
+    const pwd = document.getElementById("pwd").value;
+    const cpwd = document.getElementById("cpwd").value;
+    const errorMsg = document.getElementById("error-msg");
+
+    errorMsg.innerText = "";
+
+    if (!fname || !lname || !email || !uname || !pwd || !cpwd) {
+        errorMsg.innerText = "All fields are required.";
+        e.preventDefault();
+        return;
+    }
+
+    if (!email.includes("@")) {
+        errorMsg.innerText = "Enter a valid email address.";
+        e.preventDefault();
+        return;
+    }
+
+    if (uname.length < 3) {
+        errorMsg.innerText = "Username must be at least 3 characters.";
+        e.preventDefault();
+        return;
+    }
+
+    if (pwd.length < 6) {
+        errorMsg.innerText = "Password must be at least 6 characters.";
+        e.preventDefault();
+        return;
+    }
+
+    if (pwd !== cpwd) {
+        errorMsg.innerText = "Passwords do not match.";
+        e.preventDefault();
+        return;
+    }
+});
+</script>
+
+{% endblock %}

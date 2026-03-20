@@ -1,0 +1,214 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block body %}
+
+<!-- Breadcrumb -->
+<div class="breadcrumb-option">
+    <div class="container">
+        <div class="breadcrumb__links">
+            <a href="{% url 'index' %}"><i class="fa fa-home"></i> Home</a>
+            <span>Shop</span>
+        </div>
+    </div>
+</div>
+
+<!-- Shop Section -->
+<section class="shop spad">
+    <div class="container">
+        <div class="row">
+
+            <!-- REMOVE EMPTY SIDEBAR : FULL WIDTH PRODUCTS -->
+            <div class="col-lg-12">
+                <div class="row">
+
+                    {% for product in products %}
+                    <div class="col-lg-3 col-md-4 col-sm-6">
+                        <div class="product__item">
+
+                            <!-- Product Image -->
+                            {% if product.images.first %}
+                                <div class="product__item__pic set-bg" 
+                                     data-setbg="{{ product.images.first.image.url }}">
+                            {% else %}
+                                <div class="product__item__pic set-bg" 
+                                     data-setbg="{{ product.image.url }}">
+                            {% endif %}
+
+                                <!-- LABELS -->
+                                {% if product.stock == 0 %}
+                                    <div class="label stockout">OUT</div>
+                                {% elif product.sale %}
+                                    <div class="label sale">SALE</div>
+                                {% else %}
+                                    <div class="label new">NEW</div>
+                                {% endif %}
+
+                                <!-- HOVER ICONS -->
+                                <ul class="product__hover">
+                                    <li>
+                                        <a href="{{ product.get_primary_image_url }}" class="image-popup">
+                                            <span class="arrow_expand"></span>
+                                        </a>
+                                    </li>
+
+                                    <!-- Wishlist -->
+                                    <li>
+                                        <a href="{% url 'toggle_wishlist' product.id %}">
+                                            <span class="icon_heart_alt"></span>
+                                        </a>
+                                    </li>
+
+                                    <li>
+    {% if product.variants.exists %}
+        <!-- If variant exists, go to product page -->
+        <a href="{% url 'product_details' product.slug %}">
+            <span class="icon_bag_alt"></span>
+        </a>
+    {% else %}
+        <!-- Direct add-to-cart for simple products -->
+        <a href="{% url 'add_to_cart' product_id=product.id %}">
+            <span class="icon_bag_alt"></span>
+        </a>
+    {% endif %}
+</li>
+
+                                </ul>
+
+                            </div>
+
+                            <!-- Product Info -->
+                            <div class="product__item__text">
+                                <h6>
+                                    <a href="{% url 'product_details' product.slug %}">
+                                        {{ product.title }}
+                                    </a>
+                                </h6>
+
+                                <!-- Rating -->
+                                <div class="rating">
+                                    {% for star in "12345"|make_list %}
+                                        {% if forloop.counter <= product.rating %}
+                                            <i class="fa fa-star"></i>
+                                        {% else %}
+                                            <i class="fa fa-star-o"></i>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+
+                                <!-- Price -->
+                                <div class="product__price">
+                                    ₹ {{ product.price }}
+                                    {% if product.old_price %}
+                                        <span>₹ {{ product.old_price }}</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                    {% endfor %}
+
+                    <!-- Pagination -->
+                    <div class="col-lg-12 text-center">
+                        <div class="pagination__option">
+                            {% if products.has_previous %}
+                                <a href="?page={{ products.previous_page_number }}">Prev</a>
+                            {% endif %}
+
+                            {% for num in products.paginator.page_range %}
+                                {% if products.number == num %}
+                                    <a class="active" href="?page={{ num }}">{{ num }}</a>
+                                {% else %}
+                                    <a href="?page={{ num }}">{{ num }}</a>
+                                {% endif %}
+                            {% endfor %}
+
+                            {% if products.has_next %}
+                                <a href="?page={{ products.next_page_number }}">
+                                    <i class="fa fa-angle-right"></i>
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+
+<!-- set-bg Script -->
+<script>
+document.querySelectorAll(".set-bg").forEach(el => {
+    el.style.backgroundImage = `url(${el.dataset.setbg})`;
+});
+</script>
+
+<!-- FIX CSS -->
+<style>
+
+/* ---------- PRODUCT IMAGE ---------- */
+.product__item__pic {
+    position: relative !important;
+    height: 330px !important;
+    background-size: cover !important;
+    background-position: center !important;
+    border-radius: 6px !important;
+    overflow: hidden !important;
+}
+
+/* ---------- HOVER ICON WRAPPER ---------- */
+.product__hover {
+    position: absolute !important;
+    bottom: 15px !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    gap: 18px !important;
+    z-index: 100 !important;
+    opacity: 0 !important;
+    transition: all 0.3s ease !important;
+}
+
+/* Show hover icons when hovering image box */
+.product__item__pic:hover .product__hover {
+    opacity: 1 !important;
+}
+
+/* ---------- ICON CIRCLE ---------- */
+.product__hover li {
+    list-style: none !important;
+}
+
+.product__hover li a {
+    width: 45px !important;
+    height: 45px !important;
+    border-radius: 50% !important;
+    background: #ffffff !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    font-size: 20px !important;
+    color: #111 !important;
+    transition: all 0.2s ease !important;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15) !important;
+}
+
+/* ---------- HOVER EFFECT (RED) ---------- */
+.product__hover li a:hover {
+    background: #e60023 !important;  /* RED */
+    color: #fff !important;
+}
+
+.product__hover li a span {
+    font-size: 20px !important;
+}
+
+</style>
+
+
+{% endblock %}
